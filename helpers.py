@@ -4,6 +4,8 @@ import decimal
 import requests
 from loguru import logger
 from requests import exceptions
+import datetime
+import time
 
 logger.add(sys.stderr, format='{time} {level} {message}', level="INFO")
 
@@ -72,11 +74,14 @@ class TradingHelper:
             'instrument': rfq_response['instrument'],
             'side': rfq_response['side'],
             'quantity': rfq_response['quantity'],
+            'client_order_id': str(uuid.uuid4()),
             'price': rfq_response['price'],
+            'order_type': 'FOK',
+            'valid_until': datetime.datetime.utcfromtimestamp(time.time() + 10).strftime("%Y-%m-%dT%H:%M:%S"),
             'rfq_id': rfq_response['rfq_id'],
             'executing_unit': 'risk-adding-strategy'
         }
-        response = self.get_response('https://api.uat.b2c2.net/trade/', payload)
+        response = self.get_response('https://api.uat.b2c2.net/order/', payload)
         return response.content
 
     def get_balance(self):
